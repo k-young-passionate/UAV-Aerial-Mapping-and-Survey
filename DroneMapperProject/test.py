@@ -13,8 +13,8 @@ webhook = "https://webhook.site/8ff5306f-8e25-4788-b4cd-204ca14c55dc"
 task_name = "DJI NIR Phantom 3 Advanced"
 
 res = requests.post('https://dronemapper.io/api/token-auth/',
-                    data={'username': 'API-USERNAME',
-                          'password': 'API-PASSWORD'}).json()
+                    data={'username': 'USERNAME',
+                          'password': 'USERPASS'}).json()
 
 if 'token' in res:
     print("[*] Got DroneMapper API Token")
