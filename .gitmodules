@@ -1,3 +1,6 @@
 [submodule "MicMac/micmac"]
 	path = MicMac/micmac
 	url = https://github.com/micmacIGN/micmac.git
+[submodule "orthomosaic"]
+	path = orthomosaic
+	url = https://github.com/alexhagiopol/orthomosaic.git
