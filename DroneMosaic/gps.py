@@ -78,7 +78,7 @@ class ImageMetaData(object):
                     lng = 0 - lng
         return lat, lng
 
-path_name = 'path/to/your/image.jpg'
+path_name = os.path.abspath('/Users/choeyujin/Project/Purdue_Proejct/UAV-Aerial-Mapping-and-Survey/DroneMosaic/images/DJI_0001.JPG')
 meta_data =  ImageMetaData(path_name)
 latlng =meta_data.get_lat_lng()
 print(latlng)
