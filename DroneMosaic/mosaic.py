@@ -16,10 +16,11 @@ import numpy as np
 import glob
 import time
 import os
-# import math
 
-FilepathFirst = os.path.abspath("/Users/choeyujin/Project/Purdue_Proejct/UAV-Aerial-Mapping-and-Survey/Drone-Images-Mosaicing/images2/DSC00229.JPG")
-FilepathAll = os.path.abspath("/Users/choeyujin/Project/Purdue_Proejct/UAV-Aerial-Mapping-and-Survey/Drone-Images-Mosaicing/images2/*.JPG")
+MIN_MATCH_COUNT = 8
+
+FilepathFirst = os.path.abspath("/Users/choeyujin/Project/Purdue_Proejct/UAV-Aerial-Mapping-and-Survey/DroneMosaic/images/DJI_0001.JPG")
+FilepathAll = os.path.abspath("/Users/choeyujin/Project/Purdue_Proejct/UAV-Aerial-Mapping-and-Survey/DroneMosaic/images/*.JPG")
 img1 = cv2.imread(FilepathFirst)
 
 tic = time.clock()
@@ -89,7 +90,7 @@ def giveMosaic(FirstImage, no):
     i = 1
     
     heightM, widthM = FirstImage.shape[:2]
-    FirstImage = cv2.resize(FirstImage, (int(widthM / 4), int(heightM / 4)), interpolation=cv2.INTER_LINEAR_EXACT)
+    FirstImage = cv2.resize(FirstImage, (int(widthM / 4), int(heightM / 4)), interpolation=cv2.INTER_CUBIC)
     RecMosaic = FirstImage
     
     for name in images[1:]: # except First image
@@ -106,7 +107,7 @@ def giveMosaic(FirstImage, no):
         height, width = image.shape[:2]
 #         print(heightM, widthM, height, width)        
         
-        image = cv2.resize(image, (int(width / 4), int(height / 4)),interpolation=cv2.INTER_LINEAR_EXACT)
+        image = cv2.resize(image, (int(width / 4), int(height / 4)),interpolation=cv2.INTER_CUBIC)
         ###########################
 
 
@@ -137,55 +138,57 @@ def giveMosaic(FirstImage, no):
         ##################################
         
         #### Finding the homography #########
-        src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
-        dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
-        
-        #all_src_pts = np.float32([ kp1[m.queryIdx].pt for m in allPoints ]).reshape(-1,1,2)
-        #all_dst_pts = np.float32([ kp2[m.trainIdx].pt for m in allPoints ]).reshape(-1,1,2)
-        
-        M,  = cv2.findHomography(dst_pts, src_pts, cv2.RANSAC, 5.0)
+        if len(good) >= MIN_MATCH_COUNT :
+            src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
+            dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
+            
+            #all_src_pts = np.float32([ kp1[m.queryIdx].pt for m in allPoints ]).reshape(-1,1,2)
+            #all_dst_pts = np.float32([ kp2[m.trainIdx].pt for m in allPoints ]).reshape(-1,1,2)
+            
+            M, tmp = cv2.findHomography(dst_pts, src_pts, cv2.RANSAC, 20.0)
 
-        ###################################
-    
+            ###################################
         
-        #### Finding the euclidean distance error ####
-        list1 = np.array(src_pts)    
-        list2 = np.array(dst_pts)
-        list2 = np.reshape(list2, (len(list2), 2))
-        ones = np.ones(len(list1))    
-        TestPoints = np.transpose(np.reshape(list1, (len(list1), 2)))
-        print("Length:", np.shape(TestPoints), np.shape(ones))
-        TestPointsHom = np.vstack((TestPoints, ones))  
-        print("Homogenous Points:", np.shape(TestPointsHom))
+            
+            #### Finding the euclidean distance error ####
+            list1 = np.array(src_pts)    
+            list2 = np.array(dst_pts)
+            list2 = np.reshape(list2, (len(list2), 2))
+            ones = np.ones(len(list1))    
+            TestPoints = np.transpose(np.reshape(list1, (len(list1), 2)))
+            print("Length:", np.shape(TestPoints), np.shape(ones))
+            TestPointsHom = np.vstack((TestPoints, ones))  
+            print("Homogenous Points:", np.shape(TestPointsHom))
 
-        if M is None :
-            print("M is none")
-            continue
-        print("M", M)
-        print("TestPointsHom", TestPointsHom)
+            if M is None :
+                print("M is none")
+                continue
+            print("M", M)
+            print("TestPointsHom", TestPointsHom)
 
-        projectedPointsH = np.matmul(M, TestPointsHom)  # projecting the points in test image to collage image using homography matrix    
-        projectedPointsNH = np.transpose(np.array([np.true_divide(projectedPointsH[0,:], projectedPointsH[2,:]), np.true_divide(projectedPointsH[1,:], projectedPointsH[2,:])]))
-        
-        print("list2 shape:", np.shape(list2))
-        print("NH Points shape:", np.shape(projectedPointsNH))
-        print("Raw Error Vector:", np.shape(np.linalg.norm(projectedPointsNH-list2, axis=1)))
-        Error = int(np.sum(np.linalg.norm(projectedPointsNH-list2, axis=1)))
-        print("Total Error:", Error)
-        AvgError = np.divide(np.array(Error), np.array(len(list1)))
-        print("Average Error:", AvgError)
-        
-        ##################       
-        
-        i+=1
+            projectedPointsH = np.matmul(M, TestPointsHom)  # projecting the points in test image to collage image using homography matrix    
+            projectedPointsNH = np.transpose(np.array([np.true_divide(projectedPointsH[0,:], projectedPointsH[2,:]), np.true_divide(projectedPointsH[1,:], projectedPointsH[2,:])]))
+            
+            print("list2 shape:", np.shape(list2))
+            print("NH Points shape:", np.shape(projectedPointsNH))
+            print("Raw Error Vector:", np.shape(np.linalg.norm(projectedPointsNH-list2, axis=1)))
+            Error = int(np.sum(np.linalg.norm(projectedPointsNH-list2, axis=1)))
+            print("Total Error:", Error)
+            AvgError = np.divide(np.array(Error), np.array(len(list1)))
+            print("Average Error:", AvgError)
+            
+            ##################       
+            
+            i+=1
 
-        RecMosaic = warpImages(RecMosaic, image, M)
-        cv2.imwrite("FinalMosaicTemp.jpg", RecMosaic)
-        print(i)
-        
-        EList.append(AvgError)
-        ImgList.append(i)
-        
+            RecMosaic = warpImages(RecMosaic, image, M)
+            cv2.imwrite("FinalMosaicTemp.jpg", RecMosaic)
+            print(i)
+            
+            EList.append(AvgError)
+            ImgList.append(i)
+        else :
+            print("Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT))
         if i==40:
             break
         
