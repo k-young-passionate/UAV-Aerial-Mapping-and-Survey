@@ -1,6 +1,7 @@
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 import os
+import glob
 
 class ImageMetaData(object):
     '''
@@ -79,9 +80,15 @@ class ImageMetaData(object):
                     lng = 0 - lng
         return lat, lng
 
-path_name = os.path.abspath('/Users/choeyujin/Project/Purdue_Proejct/UAV-Aerial-Mapping-and-Survey/DroneMosaic/images/DJI_0002.JPG')
-meta_data =  ImageMetaData(path_name)
-latlng =meta_data.get_lat_lng()
-print(latlng) # latlang[0] = lat, latlang[1] = lng
-#exif_data = meta_data.get_exif_data()
-#print(exif_data)
+if __name__ == "__main__" :
+
+    FilepathAll = os.path.abspath("/Users/choeyujin/Project/Purdue_Proejct/UAV-Aerial-Mapping-and-Survey/DroneMosaic/images/*.JPG")
+    images = sorted(glob.glob(FilepathAll))
+
+    for name in images :
+        meta_data =  ImageMetaData(name)
+        latlng = meta_data.get_lat_lng()
+        print(name ,latlng) # latlang[0] = lat, latlang[1] = lng
+
+        #exif_data = meta_data.get_exif_data()
+        #print(exif_data)
