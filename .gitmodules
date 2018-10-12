@@ -4,3 +4,6 @@
 [submodule "orthomosaic"]
 	path = orthomosaic
 	url = https://github.com/alexhagiopol/orthomosaic.git
+[submodule "DroneMosaic/DroneMosaic/zAI"]
+	path = DroneMosaic/DroneMosaic/zAI
+	url = https://github.com/BiometricVox/zAI
