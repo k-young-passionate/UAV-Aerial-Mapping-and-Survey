@@ -163,7 +163,7 @@ if __name__ == "__main__":
     #meta = load_meta("cfg/imagenet1k.data")
     #r = classify(net, meta, im)
     #print r[:10]
-    net = load_net(b"cfg/yolov3.cfg", b"cfg/yolov3.weights", 0)
+    net = load_net(b"cfg/yolov1.cfg", b"cfg/yolo.weights", 0)
     meta = load_meta(b"cfg/coco.data")
     img = "data/dog.jpg"
     r = detect(net, meta, b"data/dog.jpg")
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     fig,ax = plt.subplots(1)
     #fig.set_size_inches(imgw,imgh)
     ax.imshow(im2)
-    for k in range(len(r)):  
+    for k in range(len(r)):
         width =  r[k][2][2]
         height = r[k][2][3]
         center_x = r[k][2][0]
@@ -185,7 +185,6 @@ if __name__ == "__main__":
         bottomLeft_x = center_x - (width / 2)
         bottomLeft_y = center_y - (height / 2)
         rect = patches.Rectangle((bottomLeft_x, bottomLeft_y), width, height, linewidth=1, edgecolor='r', facecolor='none')
-        ax.add_patch(rect)     
     plt.show()
     plt.savefig('image.jpg')
     #print (r[:10])
