@@ -19,8 +19,8 @@ import os
 
 MIN_MATCH_COUNT = 8
 
-FilepathFirst = os.path.abspath("/Users/choeyujin/Project/Purdue_Proejct/UAV-Aerial-Mapping-and-Survey/DroneMosaic/images/DJI_0001.JPG")
-FilepathAll = os.path.abspath("/Users/choeyujin/Project/Purdue_Proejct/UAV-Aerial-Mapping-and-Survey/DroneMosaic/images/*.JPG")
+FilepathFirst = os.path.abspath("/home/kyungmin/Desktop/experiment1/2,1.jpg")
+FilepathAll = os.path.abspath("/home/kyungmin/Desktop/experiment1/*.jpg")
 img1 = cv2.imread(FilepathFirst)
 
 tic = time.clock()
